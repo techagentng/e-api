@@ -10,7 +10,7 @@ import (
 
 type Config struct {
 	Debug                        bool   `envconfig:"debug"`
-	Port                         int    `envconfig:"port"`
+	PostgresPort                 int    `envconfig:"postgres_port"`
 	PostgresHost                 string `envconfig:"postgres_host"`
 	PostgresUser                 string `envconfig:"postgres_user"`
 	PostgresDB                   string `envconfig:"postgres_db"`
