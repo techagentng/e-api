@@ -3,6 +3,8 @@ package db
 import (
 	"fmt"
 	"log"
+
+	"github.com/google/uuid"
 	"github.com/techagentng/ecommerce-api/config"
 	"github.com/techagentng/ecommerce-api/models"
 	"gorm.io/driver/postgres"
@@ -48,14 +50,38 @@ func getPostgresDB(c *config.Config) *gorm.DB {
 	return gormDB
 }
 
+func SeedRoles(db *gorm.DB) error {
+	roles := []models.Role{
+		{ID: uuid.New(), Name: "Admin"},
+		{ID: uuid.New(), Name: "User"},
+	}
+
+	for _, role := range roles {
+		if err := db.FirstOrCreate(&role, models.Role{Name: role.Name}).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func migrate(db *gorm.DB) error {
+	// AutoMigrate all the models
 	err := db.AutoMigrate(
 		&models.User{},
-		&models.Role{}, 
+		&models.Blacklist{},
+		&models.Role{},
 	)
 	if err != nil {
 		return fmt.Errorf("migrations error: %v", err)
 	}
+
+	// Seed roles
+	// if err := seedRoles(db); err != nil {
+	//     return fmt.Errorf("seeding error: %v", err)
+	// }
+
+	// Add any additional migrations or seeds here if needed
 
 	return nil
 }
