@@ -76,12 +76,5 @@ func migrate(db *gorm.DB) error {
 		return fmt.Errorf("migrations error: %v", err)
 	}
 
-	// Seed roles
-	// if err := seedRoles(db); err != nil {
-	//     return fmt.Errorf("seeding error: %v", err)
-	// }
-
-	// Add any additional migrations or seeds here if needed
-
 	return nil
 }

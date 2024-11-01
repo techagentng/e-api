@@ -60,6 +60,10 @@ func (s *Server) defineRoutes(router *gin.Engine) {
     // Define the authorized group and apply the Authorize middleware
     authorized := apirouter.Group("/")
     authorized.Use(s.Authorize()) 
+	//place an order POST /orders)
+	//ListAllUserOrders
+	//CancelOrder (PATCH /order/{order_id}/cancel)
+	//UpdateOrderStatus /order/{order_id}/status
 
 
 
