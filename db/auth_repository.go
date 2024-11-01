@@ -56,15 +56,15 @@ func (a *authRepo) IsTokenInBlacklist(token string) bool {
 }
 
 func (a *authRepo) FindRoleByName(name string) (*models.Role, error) {
-    var role models.Role
-    if err := a.DB.Where("name = ?", name).First(&role).Error; err != nil {
-        if errors.Is(err, gorm.ErrRecordNotFound) {
+	var role models.Role
+	if err := a.DB.Where("name = ?", name).First(&role).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Role not foundx-:", name)
-            return nil, errors.New("role not found--x")
-        }
-        return nil, err
-    }
-    return &role, nil
+			return nil, errors.New("role not found--x")
+		}
+		return nil, err
+	}
+	return &role, nil
 }
 
 func (a *authRepo) CreateUser(user *models.User) (*models.User, error) {

@@ -2,14 +2,14 @@ package jwt
 
 import (
 	"fmt"
-	"net/http"
-	"time"
 	"github.com/golang-jwt/jwt"
 	"github.com/techagentng/ecommerce-api/errors"
+	"net/http"
+	"time"
 )
 
-const AccessTokenValidity = time.Hour * 24 * 7   
-const RefreshTokenValidity = time.Hour * 24 * 30 
+const AccessTokenValidity = time.Hour * 24 * 7
+const RefreshTokenValidity = time.Hour * 24 * 30
 
 // verifyAccessToken verifies a token
 func verifyToken(tokenString string, secret string) (*jwt.Token, error) {
@@ -65,61 +65,61 @@ func ValidateAndGetClaims(tokenString string, secret string) (jwt.MapClaims, err
 
 // GenerateToken generates only an access token
 func GenerateToken(email string, secret string, isAdmin bool, id uint, roleName string) (string, error) {
-    if secret == "" {
-        // Return a descriptive error message for missing secret
-        return "", errors.New("secret key is required", errors.ErrBadRequest.Status)
-    }
+	if secret == "" {
+		// Return a descriptive error message for missing secret
+		return "", errors.New("secret key is required", errors.ErrBadRequest.Status)
+	}
 
-    // Generate claims with the role name
-    claims := GenerateClaims(email, isAdmin, id, roleName)
+	// Generate claims with the role name
+	claims := GenerateClaims(email, isAdmin, id, roleName)
 
-    // Create and sign the token
-    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    tokenString, err := token.SignedString([]byte(secret))
-    if err != nil {
-        return "", err
-    }
-    return tokenString, nil
+	// Create and sign the token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
 }
 
 func GenerateTokenPair(email string, secret string, isAdmin bool, id uint, roleName string) (accessToken string, refreshToken string, err error) {
-    accessToken, err = GenerateToken(email, secret, isAdmin, id, roleName)
-    if err != nil {
-        return "", "", err
-    }
-    
-    refreshToken, err = GenerateRefreshToken(email, secret, isAdmin, id, roleName)
-    if err != nil {
-        return "", "", err
-    }
-    
-    return accessToken, refreshToken, nil
+	accessToken, err = GenerateToken(email, secret, isAdmin, id, roleName)
+	if err != nil {
+		return "", "", err
+	}
+
+	refreshToken, err = GenerateRefreshToken(email, secret, isAdmin, id, roleName)
+	if err != nil {
+		return "", "", err
+	}
+
+	return accessToken, refreshToken, nil
 }
 
 func GenerateRefreshToken(email string, secret string, isAdmin bool, id uint, roleName string) (string, error) {
-    if secret == "" {
-        return "", errors.New("secret key is required", errors.ErrInternalServerError.Status)
-    }
+	if secret == "" {
+		return "", errors.New("secret key is required", errors.ErrInternalServerError.Status)
+	}
 
-    // Create claims with role information if needed
-    refreshTokenClaims := jwt.MapClaims{
-        "email":    email,
-        "exp":      time.Now().Add(RefreshTokenValidity).Unix(),
-        "is_admin": isAdmin,
-        "id":       id,
-        "role":     roleName, // Include roleName if applicable
-        "type":     "refresh_token",
-    }
+	// Create claims with role information if needed
+	refreshTokenClaims := jwt.MapClaims{
+		"email":    email,
+		"exp":      time.Now().Add(RefreshTokenValidity).Unix(),
+		"is_admin": isAdmin,
+		"id":       id,
+		"role":     roleName, // Include roleName if applicable
+		"type":     "refresh_token",
+	}
 
-    refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
 
-    // Sign and get the complete encoded token as a string using the secret
-    refreshTokenString, err := refreshToken.SignedString([]byte(secret))
-    if err != nil {
-        return "", err
-    }
+	// Sign and get the complete encoded token as a string using the secret
+	refreshTokenString, err := refreshToken.SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
 
-    return refreshTokenString, nil
+	return refreshTokenString, nil
 }
 
 func GenerateClaims(email string, isAdmin bool, id uint, roleName string) jwt.MapClaims {
@@ -132,5 +132,3 @@ func GenerateClaims(email string, isAdmin bool, id uint, roleName string) jwt.Ma
 	}
 	return accessClaims
 }
-
-

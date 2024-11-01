@@ -20,10 +20,10 @@ func main() {
 	authService := services.NewAuthService(authRepo, conf)
 
 	s := &server.Server{
-		Config:                   conf,
-		AuthRepository:           authRepo,
-		AuthService:              authService,
-		DB:                       db.GormDB{},
+		Config:         conf,
+		AuthRepository: authRepo,
+		AuthService:    authService,
+		DB:             db.GormDB{},
 	}
 
 	s.Start()

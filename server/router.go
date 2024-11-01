@@ -32,18 +32,17 @@ func (s *Server) setupRouter() *gin.Engine {
 			param.ErrorMessage,
 		)
 	}))
-	
+
 	r.Use(gin.Recovery())
-	
+
 	// Use CORS middleware with appropriate configuration
 	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:     true, 
+		AllowAllOrigins:  true,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-
 
 	r.MaxMultipartMemory = 32 << 20
 	s.defineRoutes(r)
@@ -53,19 +52,16 @@ func (s *Server) setupRouter() *gin.Engine {
 
 func (s *Server) defineRoutes(router *gin.Engine) {
 
-    apirouter := router.Group("/api/v1")
-    // apirouter.POST("/auth/signup", s.handleSignup())
-    // apirouter.POST("/auth/login", s.handleLogin())
+	apirouter := router.Group("/api/v1")
+	// apirouter.POST("/auth/signup", s.handleSignup())
+	// apirouter.POST("/auth/login", s.handleLogin())
 
-    // Define the authorized group and apply the Authorize middleware
-    authorized := apirouter.Group("/")
-    authorized.Use(s.Authorize()) 
+	// Define the authorized group and apply the Authorize middleware
+	authorized := apirouter.Group("/")
+	authorized.Use(s.Authorize())
 	//place an order POST /orders)
 	//ListAllUserOrders
 	//CancelOrder (PATCH /order/{order_id}/cancel)
 	//UpdateOrderStatus /order/{order_id}/status
 
-
-
 }
-

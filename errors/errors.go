@@ -3,9 +3,9 @@ package errors
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
-	"github.com/gin-gonic/gin"
 )
 
 type Error struct {
@@ -67,5 +67,3 @@ func GetValidationError(err ValidationError) *Error {
 		Status:  http.StatusBadRequest,
 	}
 }
-
-

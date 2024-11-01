@@ -15,10 +15,10 @@ import (
 )
 
 type Server struct {
-	Config                   *config.Config
-	AuthRepository           db.AuthRepository
-	AuthService              services.AuthService
-	DB                       db.GormDB
+	Config         *config.Config
+	AuthRepository db.AuthRepository
+	AuthService    services.AuthService
+	DB             db.GormDB
 }
 
 // Server serves requests to DB with rout

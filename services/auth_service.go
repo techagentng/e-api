@@ -6,9 +6,9 @@ import (
 
 	"github.com/techagentng/ecommerce-api/config"
 	"github.com/techagentng/ecommerce-api/db"
+	apiError "github.com/techagentng/ecommerce-api/errors"
 	"github.com/techagentng/ecommerce-api/models"
 	"golang.org/x/crypto/bcrypt"
-	apiError "github.com/techagentng/ecommerce-api/errors"
 )
 
 // AuthService interface
@@ -31,12 +31,12 @@ func NewAuthService(authRepo db.AuthRepository, conf *config.Config) AuthService
 }
 
 func (a *authService) GetRoleByName(name string) (*models.Role, error) {
-    // Call the repository method to fetch the role
-    role, err := a.authRepo.FindRoleByName(name)
-    if err != nil {
-        return nil, err
-    }
-    return role, nil
+	// Call the repository method to fetch the role
+	role, err := a.authRepo.FindRoleByName(name)
+	if err != nil {
+		return nil, err
+	}
+	return role, nil
 }
 
 func (s *authService) SignupUser(user *models.User) (*models.User, error) {
