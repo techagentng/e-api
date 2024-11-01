@@ -66,6 +66,9 @@ func SeedRoles(db *gorm.DB) error {
 }
 
 func migrate(db *gorm.DB) error {
+		if err := db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`).Error; err != nil {
+			return fmt.Errorf("failed to create uuid-ossp extension: %v", err)
+		}
 	// AutoMigrate all the models
 	err := db.AutoMigrate(
 		&models.User{},

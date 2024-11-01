@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/gofrs/uuid"
 	ew "github.com/pkg/errors"
 	"github.com/techagentng/ecommerce-api/models"
 	"gorm.io/gorm"
@@ -18,6 +19,7 @@ type AuthRepository interface {
 	CreateUser(user *models.User) (*models.User, error)
 	IsEmailExist(email string) error
 	FindUserByEmail(email string) (*models.User, error)
+	FindRoleByID(roleID uuid.UUID) (*models.Role, error)
 }
 
 type authRepo struct {
@@ -46,11 +48,9 @@ func (a *authRepo) FindUserByID(id uint) (*models.User, error) {
 }
 
 func (a *authRepo) IsTokenInBlacklist(token string) bool {
-	// Normalize the token
 	normalizedToken := normalizeToken(token)
 
 	var count int64
-	// Assuming you have a Blacklist model with a Token field
 	a.DB.Model(&models.Blacklist{}).Where("token = ?", normalizedToken).Count(&count)
 	return count > 0
 }
@@ -73,7 +73,6 @@ func (a *authRepo) CreateUser(user *models.User) (*models.User, error) {
 		return nil, errors.New("user is nil")
 	}
 
-	// Create the user in the database
 	err := a.DB.Create(user).Error
 	if err != nil {
 		log.Printf("CreateUser error: %v", err)
@@ -88,14 +87,11 @@ func (a *authRepo) IsEmailExist(email string) error {
 	err := a.DB.Model(&models.User{}).Where("email = ?", email).Count(&count).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// No user found with this email, return nil
 			return nil
 		}
-		// Return wrapped error for other errors
 		return ew.Wrap(err, "gorm count error")
 	}
 	if count > 0 {
-		// Email already exists, return specific error
 		return errors.New("email already in use")
 	}
 	return nil
@@ -111,4 +107,12 @@ func (a *authRepo) FindUserByEmail(email string) (*models.User, error) {
 		return nil, fmt.Errorf("error finding user by email: %w", err)
 	}
 	return &user, nil
+}
+
+func (r *authRepo) FindRoleByID(roleID uuid.UUID) (*models.Role, error) {
+    var role *models.Role
+    if err := r.DB.Where("id = ?", roleID).First(&role).Error; err != nil {
+        return nil, err
+    }
+    return role, nil
 }
