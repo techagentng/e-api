@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -170,23 +171,28 @@ func (s *Server) handleUpdateOrderStatus() gin.HandlerFunc {
 
 func (s *Server) handleCancelOrder() gin.HandlerFunc {
     return func(c *gin.Context) {
-        // Retrieve user role from the context
-        userRole, exists := c.Get("user_role")
-        if !exists || userRole != "Admin" {
-            response.JSON(c, "Access denied: Admins only", http.StatusForbidden, nil, nil)
-            return
-        }
+        userRole, _ := c.Get("user_role")
+        userID, _ := c.Get("userID")
 
         // Retrieve order ID from URL parameter
         orderIDStr := c.Param("order_id")
-        orderID, err := strconv.ParseUint(orderIDStr, 10, 32) // Convert to uint
+        fmt.Println("Order ID parameter:", orderIDStr) // Debug logging
+        if orderIDStr == "" {
+            response.JSON(c, "Order ID cannot be empty", http.StatusBadRequest, nil, nil)
+            return
+        }
+
+        // Convert orderIDStr to uint
+        orderID64, err := strconv.ParseUint(orderIDStr, 10, 32) // Convert to uint64
         if err != nil {
             response.JSON(c, "Invalid order ID", http.StatusBadRequest, nil, err)
             return
         }
+        
+        orderID := uint(orderID64) // Convert to uint
 
         // Load the order details
-        order, err := s.OrderRepo.LoadOrderDetails(uint(orderID))
+        order, err := s.OrderRepo.LoadOrderDetails(orderID)
         if err != nil {
             response.JSON(c, "Failed to load order details", http.StatusInternalServerError, nil, err)
             return
@@ -196,14 +202,20 @@ func (s *Server) handleCancelOrder() gin.HandlerFunc {
             return
         }
 
-        // Check the current status of the order
+        // Check if the user is allowed to cancel the order
         if order.Status != "Pending" {
             response.JSON(c, "Only pending orders can be canceled", http.StatusBadRequest, nil, nil)
             return
         }
 
+        // Allow cancellation for admins or the user who owns the order
+        if userRole != "Admin" && order.UserID != userID {
+            response.JSON(c, "Access denied: You cannot cancel this order", http.StatusForbidden, nil, nil)
+            return
+        }
+
         // Update the order status to "Canceled"
-        err = s.OrderRepo.CancelOrder(uint(orderID))
+        err = s.OrderRepo.CancelOrder(orderID)
         if err != nil {
             response.JSON(c, "Failed to cancel order", http.StatusInternalServerError, nil, err)
             return
@@ -212,5 +224,8 @@ func (s *Server) handleCancelOrder() gin.HandlerFunc {
         response.JSON(c, "Order canceled successfully", http.StatusOK, nil, nil)
     }
 }
+
+
+
 
 

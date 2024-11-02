@@ -86,11 +86,20 @@ func (o *orderRepo) UpdateOrderStatus(id uint, status string) error {
 }
 
 func (o *orderRepo) CancelOrder(id uint) error {
-	return o.DB.Model(&models.Order{}).Where("id = ? AND status = ?", id, "Pending").Update("status", "Cancelled").Error
+    result := o.DB.Model(&models.Order{}).Where("id = ? AND status = ?", id, "Pending").Update("status", "Cancelled")
+    
+    if result.Error != nil {
+        return result.Error 
+    }
+
+    if result.RowsAffected == 0 {
+        return errors.New("no order found with the specified ID or the order is not in a cancellable state")
+    }
+
+    return nil 
 }
 
 func (o *orderRepo) UpdateOrder(order *models.Order) error {
-	// Perform the update operation on the order
 	if err := o.DB.Save(order).Error; err != nil {
 		log.Printf("Error updating order with ID %v: %v", order.ID, err)
 		return err
