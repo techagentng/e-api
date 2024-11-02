@@ -12,16 +12,12 @@ import (
 	"github.com/techagentng/ecommerce-api/models"
 	"gorm.io/gorm"
 )
-
-// OrderService interface
 type OrderService interface {
 	PlaceOrder(order *models.Order) (*models.Order, error)
-	ListUserOrders(userID uuid.UUID) ([]models.Order, error)
+	ListUserOrders(userID uint) ([]models.Order, error)
 	CancelOrder(orderID uuid.UUID) (*models.Order, error)
 	UpdateOrderStatus(orderID uuid.UUID, status string) (*models.Order, error)
 }
-
-// orderService struct
 type orderService struct {
 	Config    *config.Config
 	orderRepo db.OrderRepository
@@ -45,7 +41,7 @@ func (o *orderService) PlaceOrder(order *models.Order) (*models.Order, error) {
 }
 
 // ListUserOrders retrieves all orders for a specific user
-func (o *orderService) ListUserOrders(userID uuid.UUID) ([]models.Order, error) {
+func (o *orderService) ListUserOrders(userID uint) ([]models.Order, error) {
     orders, err := o.orderRepo.FindOrdersByUserID(userID) 
     if err != nil {
         log.Printf("Error fetching orders for user %s: %v", userID, err)

@@ -2,12 +2,10 @@ package models
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Order struct {
-	ID         uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
+	ID         uint       `json:"id" gorm:"primaryKey"` 
 	UserID     uint      `json:"user_id" gorm:"not null"`
 	ProductID  uint      `json:"product_id" gorm:"not null"`
 	Quantity   int       `json:"quantity" binding:"required"`
@@ -30,5 +28,14 @@ type OrderItem struct {
 }
 
 type OrderRequest struct {
-    Items []OrderItem `json:"items"` 
+    UserID uint        `json:"user_id" binding:"required"` 
+    Items  []OrderItem `json:"items" binding:"required"`   
+}
+
+type PlaceOrderResponse struct {
+    OrderID     uint `json:"order_id"`
+    UserID      uint   `json:"user_id"`
+    TotalPrice  float64 `json:"total_price"`
+    Status      string `json:"status"`
+    CreatedAt   string `json:"created_at"`
 }
