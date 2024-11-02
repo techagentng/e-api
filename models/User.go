@@ -20,6 +20,7 @@ type User struct {
 	ThumbNailURL   string    `json:"thumbnail_url,omitempty"`
 	RoleID         uuid.UUID `gorm:"type:uuid" json:"role_id"`
 	Role           Role      `gorm:"foreignKey:RoleID" json:"role"`
+	Orders   []Order   `json:"orders" gorm:"foreignKey:UserID"`
 }
 
 type LoginRequest struct {

@@ -17,12 +17,18 @@ func main() {
 
 	gormDB := db.GetDB(conf)
 	authRepo := db.NewAuthRepo(gormDB)
+	orderRepo := db.NewOrderRepo(gormDB)
+	productRepo := db.NewProductRepo(gormDB)
 	authService := services.NewAuthService(authRepo, conf)
+	orderService := services.NewOrderService(orderRepo, conf)
 
 	s := &server.Server{
 		Config:         conf,
 		AuthRepository: authRepo,
+        OrderRepo: orderRepo,
 		AuthService:    authService,
+		OrderService:   orderService,
+		ProductRepo: productRepo,
 		DB:             db.GormDB{},
 	}
 

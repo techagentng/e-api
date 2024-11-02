@@ -18,6 +18,9 @@ type Server struct {
 	Config         *config.Config
 	AuthRepository db.AuthRepository
 	AuthService    services.AuthService
+	OrderService   services.OrderService
+	OrderRepo      db.OrderRepository
+	ProductRepo	db.ProductRepository
 	DB             db.GormDB
 }
 

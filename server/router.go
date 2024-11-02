@@ -60,6 +60,10 @@ func (s *Server) defineRoutes(router *gin.Engine) {
 	authorized := apirouter.Group("/")
 	authorized.Use(s.Authorize())
 	//place an order POST /orders)
+	authorized.POST("/user/place/order", s.handlePlaceOrder())
+	// authorized.PATCH("/user/cancel/order", s.handleCancelOrder())
+	// authorized.GET("/all/user/order", s.handleListOrdersByUser())
+	
 	//ListAllUserOrders
 	//CancelOrder (PATCH /order/{order_id}/cancel)
 	//UpdateOrderStatus /order/{order_id}/status

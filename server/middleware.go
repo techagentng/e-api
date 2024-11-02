@@ -69,9 +69,7 @@ func (s *Server) Authorize() gin.HandlerFunc {
 		c.Set("userID", userID)
 		c.Set("access_token", accessToken)
 		c.Set("user_role", role)
-		log.Printf("Username in middleware: %v", c.Value("username"))
-		log.Printf("FullName in middleware: %v", c.Value("fullName"))
-		log.Printf("Profile image in middleware: %v", c.Value("profileImage"))
+		
 		c.Next()
 	}
 }
