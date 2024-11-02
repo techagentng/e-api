@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/techagentng/ecommerce-api/models"
 	"github.com/techagentng/ecommerce-api/server/response"
 )
@@ -139,59 +138,23 @@ func (s *Server) handleListUserOrders() gin.HandlerFunc {
     }
 }
 
-
-// handleUpdateOrderStatus updates the status of an order (admin privilege)
-func (s *Server) handleUpdateOrderStatus() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        orderID := c.Param("id")
-        parsedOrderID, err := uuid.Parse(orderID)
-        if err != nil {
-            response.JSON(c, "Invalid order ID", http.StatusBadRequest, nil, err)
-            return
-        }
-
-        var statusUpdate struct {
-            Status string `json:"status"`
-        }
-
-        if err := c.ShouldBindJSON(&statusUpdate); err != nil {
-            response.JSON(c, "Invalid request payload", http.StatusBadRequest, nil, err)
-            return
-        }
-
-        updatedOrder, err := s.OrderService.UpdateOrderStatus(parsedOrderID, statusUpdate.Status)
-        if err != nil {
-            response.JSON(c, "Failed to update order status", http.StatusInternalServerError, nil, err)
-            return
-        }
-
-        response.JSON(c, "Order status updated successfully", http.StatusOK, updatedOrder, nil)
-    }
-}
-
 func (s *Server) handleCancelOrder() gin.HandlerFunc {
     return func(c *gin.Context) {
         userRole, _ := c.Get("user_role")
         userID, _ := c.Get("userID")
-
-        // Retrieve order ID from URL parameter
         orderIDStr := c.Param("order_id")
-        fmt.Println("Order ID parameter:", orderIDStr) // Debug logging
+        fmt.Println("Order ID parameter:", orderIDStr) 
         if orderIDStr == "" {
             response.JSON(c, "Order ID cannot be empty", http.StatusBadRequest, nil, nil)
             return
         }
-
-        // Convert orderIDStr to uint
-        orderID64, err := strconv.ParseUint(orderIDStr, 10, 32) // Convert to uint64
+        orderID64, err := strconv.ParseUint(orderIDStr, 10, 32) 
         if err != nil {
             response.JSON(c, "Invalid order ID", http.StatusBadRequest, nil, err)
             return
         }
         
-        orderID := uint(orderID64) // Convert to uint
-
-        // Load the order details
+        orderID := uint(orderID64) 
         order, err := s.OrderRepo.LoadOrderDetails(orderID)
         if err != nil {
             response.JSON(c, "Failed to load order details", http.StatusInternalServerError, nil, err)
@@ -202,13 +165,11 @@ func (s *Server) handleCancelOrder() gin.HandlerFunc {
             return
         }
 
-        // Check if the user is allowed to cancel the order
         if order.Status != "Pending" {
             response.JSON(c, "Only pending orders can be canceled", http.StatusBadRequest, nil, nil)
             return
         }
 
-        // Allow cancellation for admins or the user who owns the order
         if userRole != "Admin" && order.UserID != userID {
             response.JSON(c, "Access denied: You cannot cancel this order", http.StatusForbidden, nil, nil)
             return
@@ -225,7 +186,69 @@ func (s *Server) handleCancelOrder() gin.HandlerFunc {
     }
 }
 
+type UpdateStatusRequest struct {
+    Status string `json:"status"`
+}
 
+func (s *Server) handleUpdateOrderStatus() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        userRole, _ := c.Get("user_role")
+        if userRole != "Admin" {
+            response.JSON(c, "Only admin users can update the order status", http.StatusForbidden, nil, nil)
+            return
+        }
 
+        orderIDStr := c.Param("order_id")
+        if orderIDStr == "" {
+            response.JSON(c, "Order ID cannot be empty", http.StatusBadRequest, nil, nil)
+            return
+        }
+
+        orderID64, err := strconv.ParseUint(orderIDStr, 10, 32)
+        if err != nil {
+            response.JSON(c, "Invalid order ID", http.StatusBadRequest, nil, err)
+            return
+        }
+        
+        orderID := uint(orderID64)
+        order, err := s.OrderRepo.LoadOrderDetails(orderID)
+        if err != nil {
+            response.JSON(c, "Failed to load order details", http.StatusInternalServerError, nil, err)
+            return
+        }
+        if order == nil {
+            response.JSON(c, "Order not found", http.StatusNotFound, nil, nil)
+            return
+        }
+
+        var req UpdateStatusRequest
+        if err := c.ShouldBindJSON(&req); err != nil {
+            response.JSON(c, "Invalid JSON format", http.StatusBadRequest, nil, err)
+            return
+        }
+        newStatus := req.Status
+
+        allowedStatuses := []string{"Pending", "Canceled", "Completed", "Shipped"}
+        isValidStatus := false
+        for _, status := range allowedStatuses {
+            if newStatus == status {
+                isValidStatus = true
+                break
+            }
+        }
+        if !isValidStatus {
+            response.JSON(c, "Invalid status value", http.StatusBadRequest, nil, nil)
+            return
+        }
+
+        err = s.OrderRepo.UpdateOrderStatus(orderID, newStatus)
+        if err != nil {
+            response.JSON(c, "Failed to update order status", http.StatusInternalServerError, nil, err)
+            return
+        }
+
+        response.JSON(c, "Order status updated successfully", http.StatusOK, nil, nil)
+    }
+}
 
 

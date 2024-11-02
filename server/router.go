@@ -63,6 +63,7 @@ func (s *Server) defineRoutes(router *gin.Engine) {
 	authorized.POST("/user/place/order", s.handlePlaceOrder())
 	authorized.GET("/user/orders", s.handleListUserOrders())
 	authorized.PATCH("/cancel/order/:order_id", s.handleCancelOrder())
+	authorized.PATCH("/update/order/:order_id", s.handleUpdateOrderStatus())
 	//ListAllUserOrders
 	//CancelOrder (PATCH /order/{order_id}/cancel)
 	//UpdateOrderStatus /order/{order_id}/status
