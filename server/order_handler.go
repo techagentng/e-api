@@ -12,7 +12,22 @@ import (
 	"github.com/techagentng/ecommerce-api/server/response"
 )
 
-// handlePlaceOrder handles placing an order
+// handlePlaceOrder handles placing a new order.
+// @Summary Place a new order
+// @Description Place a new order with specified items
+// @Tags orders
+// @Accept json
+// @Produce json
+// @Param order body struct {
+//     Items []struct {
+//         ProductID uint `json:"product_id" binding:"required"`
+//         Quantity  int  `json:"quantity" binding:"required,min=1"`
+//     } `json:"items" binding:"required"`
+// } true "Order details"
+// @Success 201 {object} response.OrderResponse "Order placed successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid request"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /user/place/order [post]
 func (s *Server) handlePlaceOrder() gin.HandlerFunc {
     return func(c *gin.Context) {
         var orderRequest struct {
@@ -102,6 +117,16 @@ func (s *Server) handlePlaceOrder() gin.HandlerFunc {
     }
 }
 
+// handleListUserOrders retrieves the list of orders for the authenticated user.
+// @Summary Retrieve user orders
+// @Description Get a list of orders placed by the authenticated user
+// @Tags orders
+// @Accept json
+// @Produce json
+// @Success 200 {array} response.OrderResponse "List of user orders"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /user/orders [get]
 func (s *Server) handleListUserOrders() gin.HandlerFunc {
     return func(c *gin.Context) {
         // Retrieve userID from the context, assuming it's set by middleware
@@ -138,6 +163,20 @@ func (s *Server) handleListUserOrders() gin.HandlerFunc {
     }
 }
 
+// handleCancelOrder cancels an order for the authenticated user.
+// @Summary Cancel an order
+// @Description Cancel an order by ID for the authenticated user
+// @Tags orders
+// @Accept json
+// @Produce json
+// @Param order_id path int true "ID of the order to be canceled"
+// @Success 200 {string} string "Order canceled successfully"
+// @Failure 400 {object} response.ErrorResponse "Bad request"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 403 {object} response.ErrorResponse "Forbidden"
+// @Failure 404 {object} response.ErrorResponse "Order not found"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /cancel/order/{order_id} [patch]
 func (s *Server) handleCancelOrder() gin.HandlerFunc {
     return func(c *gin.Context) {
         userRole, _ := c.Get("user_role")
@@ -190,6 +229,21 @@ type UpdateStatusRequest struct {
     Status string `json:"status"`
 }
 
+// handleUpdateOrderStatus updates the status of an order for the authenticated admin user.
+// @Summary Update an order status
+// @Description Update the status of an order by ID for the authenticated admin user
+// @Tags orders
+// @Accept json
+// @Produce json
+// @Param order_id path int true "ID of the order to be updated"
+// @Param status body map[string]string true "New status for the order"
+// @Success 200 {string} string "Order status updated successfully"
+// @Failure 400 {object} response.ErrorResponse "Bad request"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 403 {object} response.ErrorResponse "Forbidden"
+// @Failure 404 {object} response.ErrorResponse "Order not found"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /update/order/{order_id} [patch]
 func (s *Server) handleUpdateOrderStatus() gin.HandlerFunc {
     return func(c *gin.Context) {
         userRole, _ := c.Get("user_role")
