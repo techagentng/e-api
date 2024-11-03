@@ -3,8 +3,6 @@ package db
 import (
 	"errors"
 	"log"
-
-	"github.com/google/uuid"
 	"github.com/techagentng/ecommerce-api/models"
 	"gorm.io/gorm"
 )
@@ -15,7 +13,7 @@ type ProductRepository interface {
 	FindProductByID(id uint) (*models.Product, error)
 	FindAllProducts() ([]*models.Product, error)
 	UpdateProduct(product *models.Product) error
-	DeleteProduct(id uuid.UUID) error
+	DeleteProduct(id uint) error
 }
 
 // productRepo struct holds the database connection
@@ -69,6 +67,6 @@ func (p *productRepo) UpdateProduct(product *models.Product) error {
 }
 
 // DeleteProduct removes a product from the database
-func (p *productRepo) DeleteProduct(id uuid.UUID) error {
+func (p *productRepo) DeleteProduct(id uint) error {
 	return p.DB.Delete(&models.Product{}, id).Error
 }

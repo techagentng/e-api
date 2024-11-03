@@ -12,18 +12,20 @@ import (
 	"github.com/techagentng/ecommerce-api/server/response"
 )
 
+type OrderRequest struct {
+    Items []struct {
+        ProductID uint `json:"product_id" binding:"required"`
+        Quantity  int  `json:"quantity" binding:"required,min=1"`
+    } `json:"items" binding:"required"`
+}
+
 // handlePlaceOrder handles placing a new order.
 // @Summary Place a new order
 // @Description Place a new order with specified items
 // @Tags orders
 // @Accept json
 // @Produce json
-// @Param order body struct {
-//     Items []struct {
-//         ProductID uint `json:"product_id" binding:"required"`
-//         Quantity  int  `json:"quantity" binding:"required,min=1"`
-//     } `json:"items" binding:"required"`
-// } true "Order details"
+// @Param order body OrderRequest true "Order details"
 // @Success 201 {object} response.OrderResponse "Order placed successfully"
 // @Failure 400 {object} response.ErrorResponse "Invalid request"
 // @Failure 500 {object} response.ErrorResponse "Internal server error"
@@ -122,6 +124,7 @@ func (s *Server) handlePlaceOrder() gin.HandlerFunc {
 // @Description Get a list of orders placed by the authenticated user
 // @Tags orders
 // @Accept json
+// @Param order_id path int true "ID of the order to be canceled (must be a valid order ID)"
 // @Produce json
 // @Success 200 {array} response.OrderResponse "List of user orders"
 // @Failure 401 {object} response.ErrorResponse "Unauthorized"
@@ -236,7 +239,7 @@ type UpdateStatusRequest struct {
 // @Accept json
 // @Produce json
 // @Param order_id path int true "ID of the order to be updated"
-// @Param status body map[string]string true "New status for the order"
+// @Param status body UpdateStatusRequest true "New status for the order (must be one of Pending, Canceled, Completed, Shipped)"
 // @Success 200 {string} string "Order status updated successfully"
 // @Failure 400 {object} response.ErrorResponse "Bad request"
 // @Failure 401 {object} response.ErrorResponse "Unauthorized"

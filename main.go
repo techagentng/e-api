@@ -5,6 +5,7 @@ import (
 	"github.com/techagentng/ecommerce-api/db"
 	"github.com/techagentng/ecommerce-api/server"
 	"github.com/techagentng/ecommerce-api/services"
+	 "github.com/techagentng/ecommerce-api/docs"
 	"log"
 	_ "net/url"
 )
