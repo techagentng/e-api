@@ -40,3 +40,13 @@ This is a backend eCommerce API built with Golang and the Gin framework. The API
    ```bash
    git clone https://github.com/your-username/ecommerce-api.git
    cd ecommerce-api
+| Endpoint               | Method | Description                                   | Access       |
+|------------------------|--------|-----------------------------------------------|--------------|
+| `/api/v1/auth/register` | POST   | Register a new user                          | Public       |
+| `/api/v1/auth/login`    | POST   | Log in and receive a JWT                     | Public       |
+| `/api/v1/products`      | POST   | Create a new product                         | Admin only   |
+| `/api/v1/products`      | GET    | List all products                            | Public       |
+| `/api/v1/products/:id`  | PUT    | Update a product by ID                       | Admin only   |
+| `/api/v1/products/:id`  | DELETE | Delete a product by ID                       | Admin only   |
+| `/api/v1/orders`        | POST   | Create a new order                           | User only    |
+| `/api/v1/orders/:id`    | GET    | View order details                           | User only    |
