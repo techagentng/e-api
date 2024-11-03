@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	// "github.com/swaggo/gin-swagger"
-	//  "github.com/swaggo/gin-swagger/swaggerFiles"
+	"github.com/swaggo/gin-swagger"
+	 "github.com/swaggo/gin-swagger/swaggerFiles"
 	
 )
 
@@ -45,7 +45,7 @@ func (s *Server) setupRouter() *gin.Engine {
 	r.MaxMultipartMemory = 32 << 20
 	s.defineRoutes(r)
 
-	// r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return r
 }
